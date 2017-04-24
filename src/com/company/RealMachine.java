@@ -9,14 +9,18 @@ public class RealMachine {
     private RealCPU realCPU;
     private RealMemory realMemory;
     private VirtualMachine currentVM;
+    public static HDD hdd = new HDD();
     public static final int RM_MEMORY_SIZE = 4096;
 
     public static int[] sf = {0, 0, 0, 0}; //0-OF, 1-SF, 2-ZF, 3-CF
 
 
+
+
     public RealMachine() {
         realCPU = new RealCPU();
         realMemory = new RealMemory(RM_MEMORY_SIZE);
+        //hdd = new HDD();
     }
 
 
@@ -25,8 +29,10 @@ public class RealMachine {
 
         currentVM = new VirtualMachine();
         fillMemory(currentVM);
+        fillHDD();
+        getHdd().printHDD();
 
-        int currentVMPC = currentVM.getVirtualCPU().getPC();
+       /* int currentVMPC = currentVM.getVirtualCPU().getPC();
         int commandRead = currentVMPC + VirtualMachine.PROGRAM_START;
         Word command;
         //do until tries to access stack (<224)
@@ -46,7 +52,7 @@ public class RealMachine {
             Identify(command.getValue(), currentVM);
 
             System.out.println(command.getValue());
-        }
+        }*/
 
         System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         //currentVM.printMemory();
@@ -82,6 +88,44 @@ public class RealMachine {
 
             while (!(line.equals("HALT"))) {
                 currentVM.getVirtualMemory().write(word, counter++);
+                RealCPU.setCH1(1);
+                word = InputDevice.getInputLine();
+                RealCPU.setCH1(0);
+                line = word.getValue();
+            }
+        }
+    }
+
+    public void fillHDD() throws IOException {
+        InputDevice.openFile();
+        String line;
+        Word word;
+        //int counter = VirtualMachine.DATA_START;
+
+
+        line = InputDevice.getInputLine().getValue();
+        if (line.equals("DATA")) {
+            RealCPU.setCH1(1);
+            word = InputDevice.getInputLine();
+            RealCPU.setCH1(0);
+            line = word.getValue();
+            while (!(line.equals("CODE"))) {
+                writeWordToHDD(word);
+                //currentVM.getVirtualMemory().write(word, counter++);
+                RealCPU.setCH1(1);
+                word = InputDevice.getInputLine();
+                RealCPU.setCH1(0);
+                line = word.getValue();
+            }
+
+            //counter = VirtualMachine.PROGRAM_START;
+            RealCPU.setCH1(1);
+            word = InputDevice.getInputLine();
+            RealCPU.setCH1(0);
+            line = word.getValue();
+            while (!(line.equals("HALT"))) {
+                //currentVM.getVirtualMemory().write(word, counter++);
+                writeWordToHDD(word);
                 RealCPU.setCH1(1);
                 word = InputDevice.getInputLine();
                 RealCPU.setCH1(0);
@@ -172,7 +216,18 @@ public class RealMachine {
         return sf[3];
     }
 
+    public static HDD getHdd() {
+        return hdd;
+    }
 
+    public static Word readWordFromHDD(int address){
+        Word word = getHdd().read(address);
+        return word;
+    }
+
+    public static void writeWordToHDD(Word word){
+        getHdd().write(word);
+    }
 
 
 

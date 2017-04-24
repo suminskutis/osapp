@@ -9,5 +9,6 @@ public class Main {
 
         RealMachine rm = new RealMachine();
         rm.run();
+        //rm.fillHDD();
     }
 }

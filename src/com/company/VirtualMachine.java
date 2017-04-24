@@ -19,10 +19,6 @@ public class VirtualMachine {
     final static int STACK_START = 224;
     final static int STACK_SIZE = 32;
 
-    final int PC_ADDRESS = 109;
-    final int SP_ADDRESS = 110;
-    final int PID_ADDRESS = 111;
-
 
     // Default constructor
     public VirtualMachine(/*int index*/){
