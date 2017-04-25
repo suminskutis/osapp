@@ -31,7 +31,7 @@ public class VirtualMemory {
     }
 
     public void writeStringToWord(String string, int address){
-        memory[address - 1].setValue("0000");
+        memory[address - 1].setValue("null");
         memory[address].setValue(string);
     }
 }

@@ -18,9 +18,16 @@ public class InputDevice {
     }
 
     public static Word getInputLine() throws IOException {
-        String string = br.readLine();
+
         Word word = new Word();
-        word.setValue(string);
+
+        String string;
+        if((string = br.readLine()) == null){
+            word.setValue("NULL");
+        }else {
+            word.setValue(string);
+        }
+
 
         return word;
     }

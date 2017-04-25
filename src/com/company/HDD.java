@@ -6,6 +6,7 @@ public class HDD {
     static Word[] memory;
     static final int HDD_SIZE = 1024;
     static int lastWordIndex = 0;
+    static int programCount = 0;
 
     public HDD(){
         memory = new Word[HDD_SIZE];
@@ -30,7 +31,10 @@ public class HDD {
     }
 
     public void writeString(String string) {
-        memory[lastWordIndex].setValue(string);
+        Word word = new Word();
+        word.setValue(string);
+        memory[lastWordIndex] = word;
+       // memory[lastWordIndex].setValue(string);
         lastWordIndex++;
     }
 
@@ -54,4 +58,18 @@ public class HDD {
         }
     }
 
+    public void initMemory(){
+        Word word = new Word();
+        for(int i = 0; i < memory.length; i++){
+            memory[i] = word;
+        }
+    }
+
+    public static int getProgramCount() {
+        return programCount;
+    }
+
+   public static void incProgramCount(){
+        HDD.programCount++;
+   }
 }

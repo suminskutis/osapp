@@ -24,6 +24,8 @@ public class RealCPU {
     private static int supervisor = 0;
     private static int time = 20;
 
+    public static int[] sf = {0, 0, 0, 0}; //TODO todotodo
+
 
     public RealCPU() {
         setPTR(0);
@@ -182,5 +184,33 @@ public class RealCPU {
 
     public static void setCH3(int CH3) {
         RealCPU.CH3 = CH3;
+    }
+
+
+    //0-OF, 1-SF, 2-ZF, 3-CF
+    public static void setOF(){
+        sf[0] = 1;
+    }
+    public static void setSF(){
+        sf[1] = 1;
+    }
+    public static void setZF(){
+        sf[2] = 1;
+    }
+    public static void setCF(){
+        sf[3] = 1;
+    }
+
+    public static int getOF(){
+        return sf[0];
+    }
+    public static int getSF(){
+        return sf[1];
+    }
+    public static int getZF(){
+        return sf[2];
+    }
+    public static int getCF(){
+        return sf[3];
     }
 }

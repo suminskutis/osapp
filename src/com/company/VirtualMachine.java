@@ -38,7 +38,7 @@ public class VirtualMachine {
         for(int i = 0; i < VM_MEMORY_SIZE; i++){
             word = virtualMemory.getMemory()[i];
             if(word == null){
-                System.out.println("null");
+                System.out.println("NULL");
             }else{
             System.out.println(word.getValue() + " ");
             }
@@ -126,7 +126,7 @@ public class VirtualMachine {
         virtualCPU.decreaseSP();
         Word word = virtualMemory.read(address);
         virtualMemory.write(word, virtualCPU.getSP());
-        System.out.println(virtualCPU.getSP());
+        //System.out.println(virtualCPU.getSP());
     }
 
     public void POP(int address){
