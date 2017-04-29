@@ -62,7 +62,10 @@ public class RealMachine {
         }
 
         System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-        currentVM.printMemory();
+//        currentVM.printMemory();
+//        supervisorMemory.printSupervisorMemory();
+        System.out.println(supervisorMemory.validateProgram());
+        
     }
 
     public void fillSupervisorMemFromFlash() throws IOException {
