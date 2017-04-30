@@ -45,6 +45,11 @@ public class VirtualMachine {
         }
     }
 
+    //print registers
+    public void printReigsters(){
+        System.out.println("PC:" + virtualCPU.getPC() + " SP:" + virtualCPU.getSP());
+    }
+
 
     //~~~~~~~~~~~~~~~~COMMANDS~~~~~~~~~~~~~~~~
     public void ADD(){
@@ -55,14 +60,15 @@ public class VirtualMachine {
         int bN = Integer.parseInt(b, 16);
 
         int result = aN + bN;
-     /*   if(result > MAX_INT){ TODO uzdet tikrinima
-            RealMachine.setCF();
-        }*/
+        if(result > MAX_INT){
+            RealCPU.setCF();
+        }
 
         String resultS = Integer.toHexString(result);
         virtualMemory.writeStringToWord(resultS, virtualCPU.getSP() + 1  );
         virtualCPU.increaseSP();
         virtualCPU.increasePC();
+        RealCPU.decreaseTI();
     }
 
     public void SUB(){
@@ -73,14 +79,19 @@ public class VirtualMachine {
         int bN = Integer.parseInt(b, 16);
 
         int result = bN - aN;
-       /* if(result < 0){ TODO uzdet tikrinima
-            RealMachine.setOF();
-        }*/
+        if(result < 0){
+            RealCPU.setSF();
+        }
+        if(result == 0){
+           RealCPU.setZF();
+        }
 
         String resultS = Integer.toHexString(result);
         virtualMemory.writeStringToWord(resultS, virtualCPU.getSP() + 1);
         virtualCPU.increaseSP();
         virtualCPU.increasePC();
+        RealCPU.decreaseTI();
+
     }
 
     public void MUL(){
@@ -91,14 +102,16 @@ public class VirtualMachine {
         int bN = Integer.parseInt(b, 16);
 
         int result = aN * bN;
-        /*if(result > MAX_INT){ TODO uzdet tikrinima
-            RealMachine.setCF();
-        }*/
+        if(result > MAX_INT){
+            RealCPU.setCF();
+        }
 
         String resultS = Integer.toHexString(result);
         virtualMemory.writeStringToWord(resultS, virtualCPU.getSP() + 1);
         virtualCPU.increaseSP();
         virtualCPU.increasePC();
+        RealCPU.decreaseTI();
+
     }
 
     public void DIV(){
@@ -108,7 +121,7 @@ public class VirtualMachine {
         String b = virtualMemory.read((virtualCPU.getSP()) + 1).getValue();
         int bN = Integer.parseInt(b, 16);
 
-        int result = bN / aN;
+        int result = (int) Math.floor(bN / aN);
         /*TODO uzdet tikrinima
         if(result > MAX_INT){
             RealMachine.setCF();
@@ -118,6 +131,7 @@ public class VirtualMachine {
         virtualMemory.writeStringToWord(resultS, virtualCPU.getSP() + 1);
         virtualCPU.increaseSP();
         virtualCPU.increasePC();
+        RealCPU.decreaseTI();
     }
 
     public void PUSH(int address){
@@ -126,7 +140,8 @@ public class VirtualMachine {
         virtualCPU.decreaseSP();
         Word word = virtualMemory.read(address);
         virtualMemory.write(word, virtualCPU.getSP());
-        //System.out.println(virtualCPU.getSP());
+        virtualCPU.increasePC();
+        RealCPU.decreaseTI();
     }
 
     public void POP(int address){
@@ -134,7 +149,111 @@ public class VirtualMachine {
         Word word = virtualMemory.read(virtualCPU.getSP());
         virtualMemory.write(word, address);
         virtualMemory.writeString("0000" , virtualCPU.getSP());
+
         virtualCPU.increaseSP();
+        virtualCPU.increasePC();
+        RealCPU.decreaseTI();
+    }
+
+    public void CMP(){
+        Word upper = virtualMemory.read(virtualCPU.getSP());
+        Word lower = virtualMemory.read(virtualCPU.getSP()+1);
+
+        int upperInt = upper.getIntValue();
+        int lowerInt = lower.getIntValue();
+
+        Word write = new Word();
+
+        if(upperInt < lowerInt){
+            write.setValue("0003");
+            virtualMemory.write(write, virtualCPU.getSP()-1);
+        }
+        if(upperInt > lowerInt){
+            write.setValue("0002");
+            virtualMemory.write(write, virtualCPU.getSP()-1);
+        }
+        if(upperInt == lowerInt){
+            write.setValue("0001");
+            virtualMemory.write(write, virtualCPU.getSP()-1);
+        }
+
+        virtualCPU.decreaseSP();
+        virtualCPU.increasePC();
+        RealCPU.decreaseTI();
+    }
+
+    public void JP(String address){
+        int pcAddress = Integer.parseInt(address);
+        virtualCPU.setPC(pcAddress);
+        RealCPU.decreaseTI();
+    }
+
+    // jei steko virsune 1
+    public void JE(String address){
+
+        if(virtualMemory.readString(virtualCPU.getSP()).equals("0001")){
+            int pcAddress = Integer.parseInt(address);
+            virtualCPU.setPC(pcAddress);
+            RealCPU.decreaseTI();
+        }else{
+            virtualCPU.increasePC();
+            RealCPU.decreaseTI();
+        }
+
+
+    }
+    //jei steko virsune 3
+    public void JL(String address){
+        if(virtualMemory.readString(virtualCPU.getSP()).equals("0003")){
+            int pcAddress = Integer.parseInt(address);
+            virtualCPU.setPC(pcAddress);
+            RealCPU.decreaseTI();
+        }else{
+            virtualCPU.increasePC();
+            RealCPU.decreaseTI();
+        }
+    }
+
+    //jei steko virsune 2
+    public void JG(String address){
+        if(virtualMemory.readString(virtualCPU.getSP()).equals("0002")){
+            int pcAddress = Integer.parseInt(address);
+            virtualCPU.setPC(pcAddress);
+            RealCPU.decreaseTI();
+        }else{
+            virtualCPU.increasePC();
+            RealCPU.decreaseTI();
+        }
+    }
+
+    //jeigu CF  == 1
+    public void JB(String address){
+
+        if(RealCPU.getCF() == 1){
+            int pcAddress = Integer.parseInt(address);
+            virtualCPU.setPC(pcAddress);
+            RealCPU.decreaseTI();
+        }else{
+            virtualCPU.increasePC();
+            RealCPU.decreaseTI();
+        }
+    }
+
+
+    public void PRTS(){
+        Word word = virtualMemory.read(virtualCPU.getSP());
+        OutputDevice.printString(word);
+
+        virtualCPU.increasePC();
+        RealCPU.decreaseTI();
+    }
+
+    public void PRTN(){
+        Word word = virtualMemory.read(virtualCPU.getSP());
+        OutputDevice.printInt(word);
+
+        virtualCPU.increasePC();
+        RealCPU.decreaseTI();
     }
 
     //~~~~~~~~~~~~~~~~COMMANDS~~~~~~~~~~~~~~~~

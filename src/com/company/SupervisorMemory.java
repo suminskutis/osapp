@@ -3,9 +3,6 @@ package com.company;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
-/**
- * Created by suminskutis on 4/24/2017.
- */
 public class SupervisorMemory {
 
     static Word[] memory;

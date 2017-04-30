@@ -22,9 +22,14 @@ public class RealCPU {
     private static int CH3;
 
     private static int supervisor = 0;
-    private static int time = 20;
+    private static int time = 10;
 
-    public static int[] sf = {0, 0, 0, 0}; //TODO todotodo
+    public static int[] sf = {0, 0, 0};   //0-SF, 1-ZF, 2-CF
+
+
+    public static void printFlags(){
+        System.out.println("Status Flags: SF:" + sf[0] + " ZF:" + sf[1] + " CF:" + sf[2]);
+    }
 
 
     public RealCPU() {
@@ -187,30 +192,26 @@ public class RealCPU {
     }
 
 
-    //0-OF, 1-SF, 2-ZF, 3-CF
-    public static void setOF(){
+    //0-SF, 1-ZF, 2-CF
+
+    public static void setSF(){
         sf[0] = 1;
     }
-    public static void setSF(){
+    public static void setZF(){
         sf[1] = 1;
     }
-    public static void setZF(){
+    public static void setCF(){
         sf[2] = 1;
     }
-    public static void setCF(){
-        sf[3] = 1;
-    }
 
-    public static int getOF(){
+
+    public static int getSF(){
         return sf[0];
     }
-    public static int getSF(){
+    public static int getZF(){
         return sf[1];
     }
-    public static int getZF(){
-        return sf[2];
-    }
     public static int getCF(){
-        return sf[3];
+        return sf[2];
     }
 }

@@ -3,6 +3,7 @@ package com.company;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Scanner;
 
 public class RealMachine {
 
@@ -15,56 +16,103 @@ public class RealMachine {
     public static final int RM_MEMORY_SIZE = 4096;
 
 
-
-
-
-
     public RealMachine() {
         realCPU = new RealCPU();
         realMemory = new RealMemory(RM_MEMORY_SIZE);
         supervisorMemory = new SupervisorMemory();
         hdd = new HDD();
-
-        //hdd = new HDD();
     }
 
 
 
     public void run() throws IOException {
-
-        currentVM = new VirtualMachine();
-
         fillSupervisorMemFromFlash();
         fillHDDfromSupervisorMem();
+        currentVM = new VirtualMachine();
+
+     /*  TODO if(!supervisorMemory.validateProgram()){
+         TODO   realCPU.setSI(6) negera programa
+        }*/
+
         fillVirtualMemFromHDD(currentVM,0);
 
 
+        System.out.println("Enter 1 for step mode, 2 to execute whole program. You can execute the rest of your program even after few steps. Press 3 at any time to quit.");
+        Scanner sc = new Scanner(System.in);
+        String input = "";
+
         int currentVMPC = currentVM.getVirtualCPU().getPC();
-        int commandRead = currentVMPC + VirtualMachine.PROGRAM_START;
+        int commandIndex = currentVMPC + VirtualMachine.PROGRAM_START;
         Word command;
-        //do until tries to access stack (<224)
-        while(commandRead < VirtualMachine.STACK_START ){
-            //read command at address of PC
-            command = currentVM.getVirtualMemory().read(commandRead);
-            //if end of commands break
-            if(command == null)
+
+        while(!(input = sc.next()).equals("3")){
+            switch (input) {
+                case "1" :
+                    System.out.println("step");
+                    System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+
+                    //gaunam pc
+                     currentVMPC = currentVM.getVirtualCPU().getPC();
+                     commandIndex = currentVMPC + VirtualMachine.PROGRAM_START;
+                     //patikrinam ar nezengia i steka
+                     if(commandIndex == VirtualMachine.STACK_START){
+                         //System.out.println("pasiekem steka. quit");
+                         input = "3";
+                         break;
+                     }
+
+                     //nusiskaitom komanda
+                    command = currentVM.getVirtualMemory().read(commandIndex);
+                     //patikrinam ar komanda ne Halt
+                    if(command.getValue().equals("HALT")){
+                        //System.out.println("sutikom holta. quit");
+                        input = "3";
+                        break;
+                    }
+                    //ivykdom komanda
+                    Identify(command.getValue(), currentVM);
+
+                    currentVM.printReigsters();
+                    RealCPU.printFlags();
+                    currentVM.getVirtualMemory().printBlock(0);
+                    break;
+
+                case "2":
+                    System.out.println("execute");
+
+                     currentVMPC = currentVM.getVirtualCPU().getPC();
+                     commandIndex = currentVMPC + VirtualMachine.PROGRAM_START;
+                    //Word command;
+                    String com;
+                    //do until tries to access stack (<224)
+                    while(commandIndex < VirtualMachine.STACK_START ){
+                        //read command at address of PC
+                        command = currentVM.getVirtualMemory().read(commandIndex);
+                        //break if HALT
+                        if((com = command.getValue()).equals("HALT")){
+                            //System.out.println("BREIKINOM");
+                            break;
+                        }
+                        //execute command
+                        Identify(command.getValue(), currentVM);
+                        //get increased cpu PC value
+                        commandIndex = currentVM.getVirtualCPU().getPC() + VirtualMachine.PROGRAM_START;
+
+                    }
+
+                    currentVM.getVirtualMemory().printBlock(15);
+                    currentVM.printReigsters();
+
+                    input = "3";
+                    break;
+            }
+            if(input.equals("3")){
                 break;
-
-            //increase PC
-            currentVM.getVirtualCPU().setPC(++currentVMPC);
-            //get PC value
-            currentVMPC = currentVM.getVirtualCPU().getPC();
-            commandRead = currentVMPC + VirtualMachine.PROGRAM_START;
-
-            Identify(command.getValue(), currentVM);
-
-           // System.out.println(command.getValue());
+            }
         }
 
         System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-//        currentVM.printMemory();
-//        supervisorMemory.printSupervisorMemory();
-        System.out.println(supervisorMemory.validateProgram());
+        //System.out.println(realCPU.getTI());
         
     }
 
@@ -148,9 +196,9 @@ public class RealMachine {
                 word = hdd.read(++hddPointer);
                 line = word.getValue();
             }
+            currentVM.getVirtualMemory().write(word, counter++);
         }
     }
-
 
     public void Identify(String line, VirtualMachine VM) /*throws CloneNotSupportedException*/ {
         if(line.substring(0, 3).equals("ADD")){
@@ -183,26 +231,39 @@ public class RealMachine {
 
             //System.out.println("popinam" + address);
         }
+        else if(line.substring(0, 3).equals("CMP")){
+                VM.CMP();
+        }
         else if(line.substring(0, 2).equals("JP")){
-
-            //VM.cmdJP(x, y);
+            String address = line.substring(3,4);
+            VM.JP(address);
         }
         else if(line.substring(0, 2).equals("JE")){
-            //VM.cmdJE(x, y);
+            String address = line.substring(3,4);
+            VM.JE(address);
         }
-        else if(line.substring(0, 4).equals("FORK")){
-            //VM.cmdFORK();
+        else if((line.substring(0, 2).equals("JL"))){
+            String address = line.substring(3,4);
+            VM.JL(address);
         }
-        else if(line.substring(0, 3).equals("ISP")){
-            //VM.cmdISP();
+        else if((line.substring(0, 2).equals("JG"))){
+            String address = line.substring(3,4);
+            VM.JG(address);
+
+        }
+        else if((line.substring(0, 2).equals("JB"))) {
+            String address = line.substring(3,4);
+            VM.JB(address);
+
         }
         else if(line.substring(0, 4).equals("PRTS")){
-            //VM.cmdPRTS();
+            VM.PRTS();
         }
         else if(line.substring(0, 4).equals("PRTN")) {
-            //VM.cmdPRTN();
+            VM.PRTN();
         }
     }
+
 
 
     public  HDD getHdd() {

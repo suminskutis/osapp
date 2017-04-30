@@ -34,4 +34,18 @@ public class VirtualMemory {
         memory[address - 1].setValue("null");
         memory[address].setValue(string);
     }
+
+    public void printBlock(int block){
+        System.out.println("BLOCK: " + block);
+        int blocksEl = block * 16;
+        System.out.println("~~~~~~~~");
+        for(int i = blocksEl; i < 16 + blocksEl; i++){
+            if(memory[i] == null){
+                System.out.println("null");
+            }else{
+            System.out.println(memory[i].getValue());
+        }
+        }
+        System.out.println("~~~~~~~~");
+    }
 }
