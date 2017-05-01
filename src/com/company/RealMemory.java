@@ -2,9 +2,18 @@ package com.company;
 
 public class RealMemory {
 
-    Word[] memory;
+    static Word[] memory;
+    public final int RM_MEMORY_SIZE = 4096;
 
-    public RealMemory(int size) {
-        memory = new Word[size];
+
+    public RealMemory() {
+        memory = new Word[RM_MEMORY_SIZE];
     }
+
+    public static void write(Word word, int address) {
+        Word temp = new Word();
+        temp.setValue(word.getValue());
+        memory[address] = temp;
+    }
+
 }

@@ -5,6 +5,7 @@ public class VirtualMemory {
 
     Word[] memory;
 
+
     public VirtualMemory(int size) {
         memory = new Word[size];
     }

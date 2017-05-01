@@ -42,5 +42,11 @@ public class Word {
             data = data.substring(data.length() - 4, data.length());
     }
 
+    public static Word intToWord(int value){
+        Word word = new Word();
+        word.setIntValue(value);
+        return word;
+    }
+
 
 }

@@ -1,8 +1,5 @@
 package com.company;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 
 public class Main {
@@ -11,6 +8,11 @@ public class Main {
 
         RealMachine rm = new RealMachine();
         rm.run();
+
+    /*    Page peidzas = PageController.findFreePage();
+        Page peidzas1 = PageController.findFreePage();
+        System.out.println(peidzas.getPageIndex());
+        System.out.println(peidzas1.getPageIndex());*/
 
     }
 }

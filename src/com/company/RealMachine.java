@@ -1,7 +1,6 @@
 package com.company;
 
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -13,14 +12,31 @@ public class RealMachine {
     private SupervisorMemory supervisorMemory;
     public HDD hdd;
 
-    public static final int RM_MEMORY_SIZE = 4096;
+    public static final int RM_MEMORY_BLOCKS = 256;
+
 
 
     public RealMachine() {
         realCPU = new RealCPU();
-        realMemory = new RealMemory(RM_MEMORY_SIZE);
+        realMemory = new RealMemory();
         supervisorMemory = new SupervisorMemory();
         hdd = new HDD();
+    }
+
+    public static VirtualMachine createVM(){
+        RealCPU.setMODE(RealCPU.SUPERVISOR);
+        Page pageTable = PageController.findFreePage();
+        int pageTableRealAddress = pageTable.getPageIndex();
+
+
+        VirtualMachine VM = new VirtualMachine();
+
+        for(int i = 0; i < 16; i++){
+            Page page = PageController.findFreePage();
+            VM.getVirtualMemory().write(Word.intToWord(page.getPageIndex()), VirtualMachine.PAGE_TABLE_START + i);
+        }
+
+        return VM;
     }
 
 
@@ -28,7 +44,7 @@ public class RealMachine {
     public void run() throws IOException {
         fillSupervisorMemFromFlash();
         fillHDDfromSupervisorMem();
-        currentVM = new VirtualMachine();
+        currentVM = createVM();
 
      /*  TODO if(!supervisorMemory.validateProgram()){
          TODO   realCPU.setSI(6) negera programa
@@ -48,7 +64,7 @@ public class RealMachine {
         while(!(input = sc.next()).equals("3")){
             switch (input) {
                 case "1" :
-                    System.out.println("step");
+                    System.out.println("%% step %%");
                     System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
                     //gaunam pc
@@ -65,7 +81,7 @@ public class RealMachine {
                     command = currentVM.getVirtualMemory().read(commandIndex);
                      //patikrinam ar komanda ne Halt
                     if(command.getValue().equals("HALT")){
-                        //System.out.println("sutikom holta. quit");
+
                         input = "3";
                         break;
                     }
@@ -78,7 +94,8 @@ public class RealMachine {
                     break;
 
                 case "2":
-                    System.out.println("execute");
+                    System.out.println("%% Executing program %%");
+
 
                      currentVMPC = currentVM.getVirtualCPU().getPC();
                      commandIndex = currentVMPC + VirtualMachine.PROGRAM_START;
@@ -100,6 +117,7 @@ public class RealMachine {
 
                     }
 
+
                     currentVM.getVirtualMemory().printBlock(15);
                     currentVM.printReigsters();
 
@@ -107,6 +125,7 @@ public class RealMachine {
                     break;
             }
             if(input.equals("3")){
+                System.out.println("%% Exiting %%");
                 break;
             }
         }

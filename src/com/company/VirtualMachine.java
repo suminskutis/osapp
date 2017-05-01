@@ -10,8 +10,11 @@ public class VirtualMachine {
     public static final int VM_MEMORY_SIZE = 256;
     public static final int MAX_INT = 65535;
 
+
     final static int DATA_START = 0;
     final static int DATA_SIZE = 112;
+
+    static final int PAGE_TABLE_START = 96;
 
     final static int PROGRAM_START = 112;
     final static int PROGRAM_SIZE = 112;
