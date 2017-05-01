@@ -9,7 +9,7 @@ public class RealMachine {
     private RealCPU realCPU;
     private RealMemory realMemory;
     private VirtualMachine currentVM;
-    private SupervisorMemory supervisorMemory;
+    public SupervisorMemory supervisorMemory;
     public HDD hdd;
 
     public static final int RM_MEMORY_BLOCKS = 256;
@@ -42,7 +42,9 @@ public class RealMachine {
 
 
     public void run() throws IOException {
+
         fillSupervisorMemFromFlash();
+        //supervisorMemory.validateProgram();
         fillHDDfromSupervisorMem();
         currentVM = createVM();
 
@@ -120,6 +122,7 @@ public class RealMachine {
 
                     currentVM.getVirtualMemory().printBlock(15);
                     currentVM.printReigsters();
+                    RealCPU.printFlags();
 
                     input = "3";
                     break;

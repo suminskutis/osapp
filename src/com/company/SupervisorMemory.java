@@ -82,7 +82,7 @@ public class SupervisorMemory {
 		 
 		String[] SEGS_Array = {"DATA","CODE"};
 		String[] EXITCMDS_Array = {"HALT"};
-		String[] CMDS_Array = {"ADD", "SUB", "DIV", "MUL", "PRTS", "PU"};
+		String[] CMDS_Array = {"ADD", "SUB", "DIV", "MUL", "PRTS", "PU", "PO", "CMP", "JP", "JE", "JL", "JG", "JB", "PRTS", "PRTN"};
 		int CMDS_Array_Length = CMDS_Array.length; 
 
 //			------------------------    READING FILE INTO ARRAY    ------------------------
