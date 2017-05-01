@@ -136,10 +136,10 @@ public class SupervisorMemory {
 		    for(int i = DATASEG_id + 1; i < CODESEG_id; i++) // Looking for DATASEG values
 		    {
 		    	word = memory[i];
-		    	int numeric = Integer.parseInt(word.getValue()); // Throws exception if its not int
+		    	boolean dx = word.getValue().matches("-?[0-9a-fA-F]+");
 		    	int length = word.getValue().length();
 //		    	System.out.println("int repo: " + numeric + " ilgis: " + length);
-				if(length == 4 && numeric > 0)
+				if(length == 4 && dx )
 				{
 					INTEGERS_found = true;
 				}
