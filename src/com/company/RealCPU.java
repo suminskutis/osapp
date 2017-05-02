@@ -93,23 +93,13 @@ public class RealCPU {
                 return 3;
             case 3:
                 return 4;
-            case 4:
-                return 5;
         }
 
         switch (SI) {
             case 1:
-                return 6;
+                return 5;
             case 2:
-                return 7;
-            case 3:
-                return 8;
-            case 4:
-                return 9;
-            case 5:
-                return 10;
-            case 6:
-                return 11;
+                return 6;
         }
 
         return 0;

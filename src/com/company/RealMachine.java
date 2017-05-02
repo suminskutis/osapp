@@ -28,14 +28,12 @@ public class RealMachine {
         Page pageTable = PageController.findFreePage();
         int pageTableRealAddress = pageTable.getPageIndex();
 
-
         VirtualMachine VM = new VirtualMachine();
 
         for(int i = 0; i < 16; i++){
             Page page = PageController.findFreePage();
             VM.getVirtualMemory().write(Word.intToWord(page.getPageIndex()), VirtualMachine.PAGE_TABLE_START + i);
         }
-
         return VM;
     }
 
@@ -45,16 +43,19 @@ public class RealMachine {
 
         fillSupervisorMemFromFlash();
         //supervisorMemory.validateProgram();
+
+        //bad program format
+        if(!supervisorMemory.validateProgram()){
+            realCPU.setPI(3);
+        }
+
         fillHDDfromSupervisorMem();
         currentVM = createVM();
-
-     /*  TODO if(!supervisorMemory.validateProgram()){
-         TODO   realCPU.setSI(6) negera programa
-        }*/
 
         fillVirtualMemFromHDD(currentVM,0);
 
 
+        realCPU.setMODE(1);
         System.out.println("Enter 1 for step mode, 2 to execute whole program. You can execute the rest of your program even after few steps. Press 3 at any time to quit.");
         Scanner sc = new Scanner(System.in);
         String input = "";
@@ -122,7 +123,7 @@ public class RealMachine {
 
                     currentVM.getVirtualMemory().printBlock(15);
                     currentVM.printReigsters();
-                    RealCPU.printFlags();
+                    //RealCPU.printFlags();
 
                     input = "3";
                     break;
